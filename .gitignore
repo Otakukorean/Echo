@@ -66,3 +66,7 @@ nunit-*.xml
 
 # Docker
 docker-compose.override.yml
+
+
+# Kiro
+.kiro/
