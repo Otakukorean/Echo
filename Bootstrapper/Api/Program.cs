@@ -1,7 +1,4 @@
-using Carter;
-using Identity;
-using Shared.Exceptions.Handler;
-using Shared.Extentions;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,9 +6,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // common services: carter , mediatr , fluent validation
 var identityModule = typeof(IdentityModule).Assembly;
+var storesModule = typeof(StoresModule).Assembly;
 builder.Services.AddIdentityModule(builder.Configuration);
-builder.Services.AddMediatRWithAssemblies(identityModule);
-builder.Services.AddCarterWithAssemblies(identityModule);
+builder.Services.AddStoresModule(builder.Configuration);
+
+builder.Services.AddMediatRWithAssemblies(identityModule , storesModule);
+builder.Services.AddCarterWithAssemblies(identityModule , storesModule);
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -56,6 +56,6 @@ app.UseAuthorization();
 
 app.MapCarter();
 app.UseExceptionHandler(options => { });
-app.UseIdentityModule();
+app.UseIdentityModule().UseStoresModule();
 
 app.Run();
