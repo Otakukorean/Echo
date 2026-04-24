@@ -63,3 +63,6 @@ nunit-*.xml
 .DS_Store
 .AppleDouble
 .LSOverride
+
+# Docker
+docker-compose.override.yml
