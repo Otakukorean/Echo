@@ -1,6 +1,6 @@
 namespace Identity.Identity.Dtos;
 
-public class LoginDto
-{
-    
-}
+public record LoginDto(
+    string Email,
+    string Password
+    );

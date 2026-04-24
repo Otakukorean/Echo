@@ -1,6 +1,18 @@
-namespace Identity;
-
-public class GlobalUsings
-{
-    
-}
+global using Microsoft.AspNetCore.Builder;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Shared.DDD;
+global using FluentValidation;
+global using Identity.Data;
+global using Identity.Identity.Dtos;
+global using Identity.Identity.Exceptions;
+global using Identity.Identity.Models;
+global using Microsoft.EntityFrameworkCore;
+global using Shared.Contracts.CQRS;
+global using Carter;
+global using MediatR;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Routing;
+global using Identity.Identity.Services;
+global using Microsoft.Extensions.Options;
