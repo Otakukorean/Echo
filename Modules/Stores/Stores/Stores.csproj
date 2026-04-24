@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared.Contracts\Shared.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Stores\EventHandlers\" />
+    <Folder Include="Stores\Events\" />
+    <Folder Include="Stores\Features\DeleteStore\" />
+    <Folder Include="Stores\Features\GetAllStores\" />
+    <Folder Include="Stores\Features\GetStoreById\" />
+    <Folder Include="Stores\Features\UpdateStore\" />
+  </ItemGroup>
+
+</Project>
