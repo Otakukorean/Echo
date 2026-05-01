@@ -7,5 +7,6 @@ public record StoreDto(
     string Description,
     string LogoUrl,
     string? CoverUrl,
-    DateTime? CreatedAt
+    DateTime? CreatedAt,
+    Guid OwnerId
     );

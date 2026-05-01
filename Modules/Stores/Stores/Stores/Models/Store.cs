@@ -32,4 +32,18 @@ public class Store : Aggregate<Guid>
             OwnerId = ownerId
         };
     }
+    
+    public void Update(string name, string slug, string description, string logoUrl, string? coverUrl)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(slug);
+        ArgumentException.ThrowIfNullOrWhiteSpace(description);
+        ArgumentException.ThrowIfNullOrWhiteSpace(logoUrl);
+        
+        Name = name;
+        Slug = slug;
+        Description = description;
+        LogoUrl = logoUrl;
+        CoverUrl = coverUrl;
+    }
 }

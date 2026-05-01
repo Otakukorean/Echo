@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Stores.Data;
 using Stores.Stores.Dtos;
 using Stores.Stores.Exceptions;
-using Stores.Stores.Features.CreateStore;
+using Stores.Stores.Features.Dashboard.CreateStore;
 using Stores.Stores.Models;
 using Stores.Tests.Helpers;
 using Xunit;
@@ -38,6 +38,7 @@ public class CreateStoreHandlerTests : IDisposable
         result.Store.Description.Should().Be("A test store");
         result.Store.LogoUrl.Should().Be("https://example.com/logo.png");
         result.Store.CoverUrl.Should().Be("https://example.com/cover.png");
+        result.Store.OwnerId.Should().Be(_ownerId);
         result.Store.Id.Should().NotBe(Guid.Empty);
     }
 
