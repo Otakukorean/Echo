@@ -8,8 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Shared.Authorization;
 using Shared.Data;
 using Shared.Data.Interceptors;
+using Shared.Contracts.Identity;
 
 namespace Identity;
 
@@ -34,6 +36,7 @@ public static class IdentityModule
 
         // Register TokenService
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<ITokenReissuer, TokenReissuer>();
 
         // Register TimeProvider
         services.AddSingleton(TimeProvider.System);
@@ -60,7 +63,12 @@ public static class IdentityModule
             };
         });
 
-        services.AddAuthorization();
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy(PolicyNames.MustHaveStore, policy =>
+                policy.Requirements.Add(new MustHaveStoreRequirement()));
+        });
+        services.AddScoped<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, MustHaveStoreHandler>();
 
         return services;
     }
