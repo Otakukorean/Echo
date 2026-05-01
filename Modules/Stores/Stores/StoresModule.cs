@@ -14,6 +14,7 @@ public static class StoresModule
             options.UseNpgsql(connectionString);
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
         });
+        services.AddScoped<IStoreOwnershipChecker, StoreOwnershipChecker>();
         return services;
     }
 

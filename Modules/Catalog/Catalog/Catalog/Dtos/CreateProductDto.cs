@@ -1,0 +1,4 @@
+namespace 
+    ;
+
+public record CreateProductDto();

@@ -10,3 +10,6 @@ global using Shared.DDD;
 global using Stores.Stores.Models;
 global using Shared.Contracts.CQRS;
 global using Stores.Stores.Dtos;
+global using Shared.Contracts.StoreContext;
+global using Stores.Stores.Services;
+global using Shared.Authorization;

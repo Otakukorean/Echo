@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\Shared\Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Catalog\Dtos\" />
+      <Folder Include="Catalog\EventHandlers\" />
+      <Folder Include="Catalog\Event\" />
+      <Folder Include="Catalog\Exceptions\" />
+      <Folder Include="Catalog\Features\" />
+    </ItemGroup>
+
+</Project>
