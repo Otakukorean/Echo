@@ -41,9 +41,9 @@ public class UpdateVariationEndpoint : CarterModule
                 request.Active,
                 request.Color,
                 request.Quantity,
-                request.Url.OpenReadStream(),
-                request.Url.FileName,
-                request.Url.ContentType);
+                request.Url?.OpenReadStream(),
+                request.Url?.FileName,
+                request.Url?.ContentType);
             var response = await sender.Send(new UpdateVariationCommand(dto, variationId, productId, store.Id));
             return Results.Ok(response);
         })

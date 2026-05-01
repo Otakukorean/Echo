@@ -6,6 +6,6 @@ public record UpdateVariationDto(
     bool Active,
     string? Color,
     int Quantity,
-    Stream FileStream,
-    string FileName,
-    string ContentType);
+    Stream? FileStream,
+    string? FileName,
+    string? ContentType);

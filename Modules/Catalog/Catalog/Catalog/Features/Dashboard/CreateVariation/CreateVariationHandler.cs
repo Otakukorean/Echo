@@ -21,19 +21,24 @@ public class CreateVariationHandler(CatalogDbContext dbContext , IFileStorageSer
         if (!productExists)
             throw new ProductNotFound("Product not found");
 
-        var folder = $"{request.StoreId}/{request.ProductId}";
-        var uploadResult = await fileStorage.UploadAsync(
-            request.Dto.FileStream,
-            request.Dto.FileName,
-            request.Dto.ContentType,
-            ContainerName,
-            folder,
-            cancellationToken);
+        string? imageUrl = null;
+        if (request.Dto.FileStream is not null && request.Dto.FileName is not null && request.Dto.ContentType is not null)
+        {
+            var folder = $"{request.StoreId}/{request.ProductId}";
+            var uploadResult = await fileStorage.UploadAsync(
+                request.Dto.FileStream,
+                request.Dto.FileName,
+                request.Dto.ContentType,
+                ContainerName,
+                folder,
+                cancellationToken);
+            imageUrl = uploadResult.Url;
+        }
         
         var variation = Variation.Create(
             request.Dto.Quantity,
             request.Dto.Color,
-            uploadResult.Url,
+            imageUrl,
             request.Dto.Price,
             request.Dto.Value,
             request.Dto.Active,

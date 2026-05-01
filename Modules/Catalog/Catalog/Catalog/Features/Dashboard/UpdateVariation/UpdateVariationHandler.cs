@@ -27,26 +27,29 @@ public class UpdateVariationHandler(CatalogDbContext dbContext, IFileStorageServ
         if (variation is null)
             throw new VariationNotFound("Variation not found");
 
-        // Delete old image if it exists
-        if (!string.IsNullOrWhiteSpace(variation.Url))
+        // Upload new image only if a file was provided
+        string? newUrl = variation.Url;
+        if (request.Dto.FileStream is not null && request.Dto.FileName is not null && request.Dto.ContentType is not null)
         {
-            await fileStorage.DeleteAsync(variation.Url, cancellationToken);
-        }
+            // Delete old image if it exists
+            if (!string.IsNullOrWhiteSpace(variation.Url))
+                await fileStorage.DeleteAsync(variation.Url, cancellationToken);
 
-        // Upload new image
-        var folder = $"{request.StoreId}/{request.ProductId}";
-        var uploadResult = await fileStorage.UploadAsync(
-            request.Dto.FileStream,
-            request.Dto.FileName,
-            request.Dto.ContentType,
-            ContainerName,
-            folder,
-            cancellationToken);
+            var folder = $"{request.StoreId}/{request.ProductId}";
+            var uploadResult = await fileStorage.UploadAsync(
+                request.Dto.FileStream,
+                request.Dto.FileName,
+                request.Dto.ContentType,
+                ContainerName,
+                folder,
+                cancellationToken);
+            newUrl = uploadResult.Url;
+        }
 
         variation.Update(
             request.Dto.Quantity,
             request.Dto.Color,
-            uploadResult.Url,
+            newUrl,
             request.Dto.Price,
             request.Dto.Value,
             request.Dto.Active);

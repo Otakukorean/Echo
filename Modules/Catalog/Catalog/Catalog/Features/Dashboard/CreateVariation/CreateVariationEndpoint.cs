@@ -35,9 +35,11 @@ public class CreateVariationEndpoint : CarterModule
             IStoreContext storeContext) =>
         {
             var store = await storeContext.GetVerifiedStoreAsync();
-            var dto = new CreateVariationDto(request.Value, request.Price, request.Active, request.Color, request.Quantity ,request.Url.OpenReadStream(),
-                request.Url.FileName,
-                request.Url.ContentType );
+            var dto = new CreateVariationDto(
+                request.Value, request.Price, request.Active, request.Color, request.Quantity,
+                request.Url?.OpenReadStream(),
+                request.Url?.FileName,
+                request.Url?.ContentType);
             var response = await sender.Send(new CreateVariationCommand(dto, productId, store.Id));
             return TypedResults.Created($"/products/{productId}/variations/{response.Variation.Id}", response);
         })
