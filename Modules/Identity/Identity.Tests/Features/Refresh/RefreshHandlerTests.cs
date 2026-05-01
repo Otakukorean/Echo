@@ -5,9 +5,12 @@ using Identity.Identity.Features.Refresh;
 using Identity.Identity.Models;
 using Identity.Identity.Services;
 using Identity.Tests.Helpers;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NSubstitute;
+using Stores.Contracts.Dtos;
+using Stores.Contracts.Features;
 using Xunit;
 
 namespace Identity.Tests.Features.Refresh;
@@ -18,13 +21,14 @@ public class RefreshHandlerTests : IDisposable
     private readonly ITokenService _tokenService;
     private readonly IOptions<JwtSettings> _jwtSettings;
     private readonly TimeProvider _timeProvider;
+    private readonly ISender _sender;
     private readonly RefreshHandler _handler;
 
     public RefreshHandlerTests()
     {
         _dbContext = DbContextFactory.Create();
         _tokenService = Substitute.For<ITokenService>();
-        _tokenService.GenerateAccessToken(Arg.Any<User>()).Returns("new-access-token");
+        _tokenService.GenerateAccessToken(Arg.Any<User>(), Arg.Any<Guid?>()).Returns("new-access-token");
         _tokenService.GenerateRefreshToken().Returns("new-refresh-token");
 
         _jwtSettings = Options.Create(new JwtSettings
@@ -39,7 +43,11 @@ public class RefreshHandlerTests : IDisposable
         _timeProvider = Substitute.For<TimeProvider>();
         _timeProvider.GetUtcNow().Returns(new DateTimeOffset(2030, 1, 15, 12, 0, 0, TimeSpan.Zero));
 
-        _handler = new RefreshHandler(_dbContext, _tokenService, _jwtSettings, _timeProvider);
+        _sender = Substitute.For<ISender>();
+        _sender.Send(Arg.Any<GetStoreByOwnerIdQuery>(), Arg.Any<CancellationToken>())
+            .Returns(new GetStoreByOwnerIdResult(null));
+
+        _handler = new RefreshHandler(_dbContext, _tokenService, _jwtSettings, _timeProvider, _sender);
     }
 
     private async Task<(User user, Session session)> SeedUserWithActiveSession(string refreshToken = "valid-token")
@@ -163,7 +171,7 @@ public class RefreshHandlerTests : IDisposable
 
         await _handler.Handle(command, CancellationToken.None);
 
-        _tokenService.Received(1).GenerateAccessToken(Arg.Any<User>());
+        _tokenService.Received(1).GenerateAccessToken(Arg.Any<User>(), Arg.Any<Guid?>());
         _tokenService.Received(1).GenerateRefreshToken();
     }
 

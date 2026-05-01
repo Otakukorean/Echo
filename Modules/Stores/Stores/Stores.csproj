@@ -9,15 +9,14 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Shared.Contracts\Shared.Contracts.csproj" />
     <ProjectReference Include="..\..\..\Shared\Shared.csproj" />
+    <ProjectReference Include="..\Stores.Contracts\Stores.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Stores\EventHandlers\" />
     <Folder Include="Stores\Events\" />
-    <Folder Include="Stores\Features\DeleteStore\" />
-    <Folder Include="Stores\Features\GetAllStores\" />
-    <Folder Include="Stores\Features\GetStoreById\" />
-    <Folder Include="Stores\Features\UpdateStore\" />
+    <Folder Include="Stores\Features\Dashboard\DeleteStore\" />
+    <Folder Include="Stores\Features\Public\" />
   </ItemGroup>
 
 </Project>

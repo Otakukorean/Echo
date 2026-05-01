@@ -1,3 +1,5 @@
+using Stores.Contracts.Features;
+
 namespace Identity.Identity.Features.Login;
 
 public record LoginCommand(LoginDto LoginDto, string IpAddress, string UserAgent) : ICommand<LoginResult>;
@@ -10,7 +12,8 @@ public class LoginHandler(
     IdentityDbContext dbContext,
     ITokenService tokenService,
     IOptions<JwtSettings> jwtSettings,
-    TimeProvider timeProvider) : ICommandHandler<LoginCommand, LoginResult>
+    TimeProvider timeProvider,
+    ISender sender) : ICommandHandler<LoginCommand, LoginResult>
 {
     public async Task<LoginResult> Handle(LoginCommand command, CancellationToken cancellationToken)
     {
@@ -33,7 +36,11 @@ public class LoginHandler(
             throw new InvalidCredentials("Invalid credentials");
         }
 
-        var accessToken = tokenService.GenerateAccessToken(user);
+        // Look up the user's store to include store_id in the token
+        var storeResult = await sender.Send(new GetStoreByOwnerIdQuery(user.Id), cancellationToken);
+        var storeId = storeResult.Store?.StoreId;
+
+        var accessToken = tokenService.GenerateAccessToken(user, storeId);
         var refreshToken = tokenService.GenerateRefreshToken();
 
         var now = timeProvider.GetUtcNow().UtcDateTime;

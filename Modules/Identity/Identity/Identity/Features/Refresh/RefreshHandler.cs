@@ -1,3 +1,5 @@
+using Stores.Contracts.Features;
+
 namespace Identity.Identity.Features.Refresh;
 
 public record RefreshCommand(string RefreshToken, string IpAddress, string UserAgent) : ICommand<RefreshResult>;
@@ -10,7 +12,8 @@ public class RefreshHandler(
     IdentityDbContext dbContext,
     ITokenService tokenService,
     IOptions<JwtSettings> jwtSettings,
-    TimeProvider timeProvider) : ICommandHandler<RefreshCommand, RefreshResult>
+    TimeProvider timeProvider,
+    ISender sender) : ICommandHandler<RefreshCommand, RefreshResult>
 {
     public async Task<RefreshResult> Handle(RefreshCommand command, CancellationToken cancellationToken)
     {
@@ -34,7 +37,11 @@ public class RefreshHandler(
 
         session.Revoke();
 
-        var accessToken = tokenService.GenerateAccessToken(user);
+        // Look up the user's store to include store_id in the new token
+        var storeResult = await sender.Send(new GetStoreByOwnerIdQuery(user.Id), cancellationToken);
+        var storeId = storeResult.Store?.StoreId;
+
+        var accessToken = tokenService.GenerateAccessToken(user, storeId);
         var newRefreshToken = tokenService.GenerateRefreshToken();
 
         var now = timeProvider.GetUtcNow().UtcDateTime;
