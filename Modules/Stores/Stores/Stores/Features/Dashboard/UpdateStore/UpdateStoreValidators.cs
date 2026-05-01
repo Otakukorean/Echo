@@ -10,6 +10,6 @@ public class UpdateStoreValidators : AbstractValidator<UpdateStoreRequest>
         RuleFor(x => x.UpdateStoreDto.Name).NotEmpty();
         RuleFor(x => x.UpdateStoreDto.Slug).NotEmpty();
         RuleFor(x => x.UpdateStoreDto.Description).NotEmpty();
-        RuleFor(x => x.UpdateStoreDto.LogoUrl).NotEmpty();      
+        RuleFor(x => x.UpdateStoreDto.LogoFileName).NotEmpty();      
     }
 }

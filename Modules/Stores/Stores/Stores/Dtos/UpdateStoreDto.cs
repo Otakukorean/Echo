@@ -4,6 +4,9 @@ public record UpdateStoreDto(
     string Name,
     string Slug,
     string Description,
-    string LogoUrl,
-    string? CoverUrl
-    );
+    Stream? LogoStream,
+    string? LogoFileName,
+    string? LogoContentType,
+    Stream? CoverStream,
+    string? CoverFileName,
+    string? CoverContentType);
