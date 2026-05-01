@@ -1,5 +1,7 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using NSubstitute;
+using Shared.Contracts.FileStorage;
 using Stores.Data;
 using Stores.Stores.Dtos;
 using Stores.Stores.Exceptions;
@@ -13,16 +15,24 @@ namespace Stores.Tests.Features.CreateStore;
 public class CreateStoreHandlerTests : IDisposable
 {
     private readonly StoresDbContext _dbContext;
+    private readonly IFileStorageService _fileStorage;
     private readonly CreateStoreHandler _handler;
     private readonly Guid _ownerId = Guid.NewGuid();
+
     public CreateStoreHandlerTests()
     {
         _dbContext = DbContextFactory.Create();
-        _handler = new CreateStoreHandler(_dbContext);
+        _fileStorage = Substitute.For<IFileStorageService>();
+        _fileStorage.UploadAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string>(),
+                Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(new FileUploadResult("https://blob.test/logo.png", "logo.png"));
+        _handler = new CreateStoreHandler(_dbContext, _fileStorage);
     }
 
-    private CreateStoreDto ValidDto(string slug = "my-store") =>
-        new("My Store", slug, "A test store", "https://example.com/logo.png", "https://example.com/cover.png");
+    private static CreateStoreDto ValidDto(string slug = "my-store") =>
+        new("My Store", slug, "A test store",
+            new MemoryStream([1, 2, 3]), "logo.png", "image/png",
+            new MemoryStream([4, 5, 6]), "cover.png", "image/png");
 
     [Fact]
     public async Task Handle_ValidCommand_CreatesStoreAndReturnsDto()
@@ -35,8 +45,6 @@ public class CreateStoreHandlerTests : IDisposable
         result.Store.Name.Should().Be("My Store");
         result.Store.Slug.Should().Be("my-store");
         result.Store.Description.Should().Be("A test store");
-        result.Store.LogoUrl.Should().Be("https://example.com/logo.png");
-        result.Store.CoverUrl.Should().Be("https://example.com/cover.png");
         result.Store.OwnerId.Should().Be(_ownerId);
         result.Store.Id.Should().NotBe(Guid.Empty);
     }
@@ -112,9 +120,11 @@ public class CreateStoreHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task Handle_NullCoverUrl_CreatesStoreSuccessfully()
+    public async Task Handle_NullCoverStream_CreatesStoreSuccessfully()
     {
-        var dto = new CreateStoreDto("No Cover", "no-cover", "desc", "https://logo.png", null);
+        var dto = new CreateStoreDto("No Cover", "no-cover", "desc",
+            new MemoryStream([1, 2, 3]), "logo.png", "image/png",
+            null, null, null);
         var command = new CreateStoreCommand(dto, _ownerId);
 
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -125,12 +135,10 @@ public class CreateStoreHandlerTests : IDisposable
     [Fact]
     public async Task Handle_OwnershipCheckRunsBeforeSlugCheck()
     {
-        // Owner already has a store with slug "existing"
         var existingStore = Store.Create("Existing", "existing", "desc", "https://logo.png", null, _ownerId);
         _dbContext.Stores.Add(existingStore);
         await _dbContext.SaveChangesAsync();
 
-        // Try to create another store with the SAME slug — should get UserAlreadyHasStore, not StoreAlreadyExist
         var command = new CreateStoreCommand(ValidDto("existing"), _ownerId);
 
         var act = () => _handler.Handle(command, CancellationToken.None);
