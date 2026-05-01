@@ -6,6 +6,9 @@ using Identity.Identity.Models;
 using Identity.Tests.Helpers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using NSubstitute;
+using Stores.Contracts.Dtos;
+using Stores.Contracts.Features;
 using Xunit;
 
 namespace Identity.Tests.Features.Me;
@@ -19,7 +22,10 @@ public class MeHandlerTests : IDisposable
     public MeHandlerTests()
     {
         _dbContext = DbContextFactory.Create();
-        _handler = new MeHandler(_dbContext , _sender);;
+        _sender = Substitute.For<ISender>();
+        _sender.Send(Arg.Any<GetStoreByOwnerIdQuery>(), Arg.Any<CancellationToken>())
+            .Returns(new GetStoreByOwnerIdResult(null));
+        _handler = new MeHandler(_dbContext, _sender);
     }
 
     private async Task<User> SeedUserWithSessions(int sessionCount = 0)
