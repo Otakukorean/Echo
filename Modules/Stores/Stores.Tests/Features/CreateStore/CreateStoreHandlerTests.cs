@@ -15,7 +15,6 @@ public class CreateStoreHandlerTests : IDisposable
     private readonly StoresDbContext _dbContext;
     private readonly CreateStoreHandler _handler;
     private readonly Guid _ownerId = Guid.NewGuid();
-
     public CreateStoreHandlerTests()
     {
         _dbContext = DbContextFactory.Create();
