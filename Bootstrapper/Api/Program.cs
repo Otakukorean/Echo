@@ -1,6 +1,8 @@
  
 
+using Shared.Email;
 using Shared.FileStorage;
+using Shared.Pdf;
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -25,16 +27,24 @@ builder.Services.AddCors(options =>
 var identityModule = typeof(IdentityModule).Assembly;
 var storesModule = typeof(StoresModule).Assembly;
 var catalogModule = typeof(CatalogModules).Assembly;
+var ordersModule = typeof(OrdersModule).Assembly;
 builder.Services.AddIdentityModule(builder.Configuration);
 builder.Services.AddStoresModule(builder.Configuration);
 builder.Services.AddCatalogModule(builder.Configuration);
+builder.Services.AddOrdersModule(builder.Configuration);
 
-builder.Services.AddMediatRWithAssemblies(identityModule , storesModule, catalogModule);
-builder.Services.AddCarterWithAssemblies(identityModule , storesModule, catalogModule);
+builder.Services.AddMediatRWithAssemblies(identityModule , storesModule, catalogModule, ordersModule);
+builder.Services.AddCarterWithAssemblies(identityModule , storesModule, catalogModule, ordersModule);
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
 // Add Azure Blob Storage
 builder.Services.AddBlobStorage(builder.Configuration);
+
+// Add Email Service
+builder.Services.AddEmailService(builder.Configuration);
+
+// Add PDF Service
+builder.Services.AddPdfService();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -80,6 +90,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapCarter();
 app.UseExceptionHandler(options => { });
-app.UseIdentityModule().UseStoresModule().UseCatalogModule();
+app.UseIdentityModule().UseStoresModule().UseCatalogModule().UseOrdersModule();
 
 app.Run();
