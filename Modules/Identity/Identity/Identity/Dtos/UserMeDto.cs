@@ -7,5 +7,6 @@ public record UserMeDto(
     bool IsActive,
     bool EmailConfirmed,
     string Role,
+    Guid? StoreId ,
     List<SessionDto> Sessions
 );

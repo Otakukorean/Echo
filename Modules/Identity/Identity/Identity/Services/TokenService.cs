@@ -18,7 +18,7 @@ public class TokenService : ITokenService
         _timeProvider = timeProvider;
     }
 
-    public string GenerateAccessToken(User user)
+    public string GenerateAccessToken(User user, Guid? storeId = null)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Secret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -30,7 +30,7 @@ public class TokenService : ITokenService
             [JwtRegisteredClaimNames.Sub] = user.Id.ToString(),
             [JwtRegisteredClaimNames.Email] = user.Email,
             ["role"] = user.Role.ToString(),
-            ["store_id"] = string.Empty
+            ["store_id"] = storeId?.ToString() ?? string.Empty
         };
 
         var descriptor = new SecurityTokenDescriptor

@@ -4,6 +4,7 @@ using Identity.Identity.Exceptions;
 using Identity.Identity.Features.Me;
 using Identity.Identity.Models;
 using Identity.Tests.Helpers;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -13,11 +14,12 @@ public class MeHandlerTests : IDisposable
 {
     private readonly IdentityDbContext _dbContext;
     private readonly MeHandler _handler;
+    private readonly ISender _sender;
 
     public MeHandlerTests()
     {
         _dbContext = DbContextFactory.Create();
-        _handler = new MeHandler(_dbContext);
+        _handler = new MeHandler(_dbContext , _sender);;
     }
 
     private async Task<User> SeedUserWithSessions(int sessionCount = 0)

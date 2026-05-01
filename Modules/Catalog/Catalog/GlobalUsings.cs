@@ -1,0 +1,15 @@
+global using Shared.DDD;
+global using Shared.Contracts.CQRS;
+global using Shared.Contracts.StoreContext;
+global using Shared.Contracts.StoreScoping;
+global using Shared.Authorization;
+global using Shared.StoreScoping;
+global using Catalog.Catalog.Models;
+global using Catalog.Catalog.Dtos;
+global using Catalog.Data;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.AspNetCore.Builder;
+global using Carter;
+global using MediatR;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.AspNetCore.Routing;

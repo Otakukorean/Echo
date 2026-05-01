@@ -1,0 +1,15 @@
+global using Microsoft.AspNetCore.Builder;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.Diagnostics;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Shared.Data;
+global using Shared.Data.Interceptors;
+global using Stores.Data;
+global using Shared.DDD;
+global using Stores.Stores.Models;
+global using Shared.Contracts.CQRS;
+global using Stores.Stores.Dtos;
+global using Shared.Contracts.StoreContext;
+global using Stores.Stores.Services;
+global using Shared.Authorization;
