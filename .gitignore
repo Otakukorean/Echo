@@ -5,6 +5,9 @@ project.lock.json
 .DS_Store
 *.pyc
 nupkg/
+**/appsettings.*.json
+!**/appsettings.json
+!**/appsettings.Development.json
 
 # Visual Studio / Rider
 .vs/
@@ -66,6 +69,7 @@ nunit-*.xml
 
 # Docker
 docker-compose.override.yml
+
 
 
 # Kiro

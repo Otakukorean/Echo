@@ -1,10 +1,12 @@
+using Stores.Contracts.Features;
+
 namespace Identity.Identity.Features.Me;
 
 public record MeQuery(Guid UserId) : IQuery<MeResponse>;
 
 public record MeResponse(UserMeDto User);
 
-public class MeHandler(IdentityDbContext dbContext) : IQueryHandler<MeQuery, MeResponse>
+public class MeHandler(IdentityDbContext dbContext , ISender sender) : IQueryHandler<MeQuery, MeResponse>
 {
     public async Task<MeResponse> Handle(MeQuery query, CancellationToken cancellationToken)
     {
@@ -29,6 +31,8 @@ public class MeHandler(IdentityDbContext dbContext) : IQueryHandler<MeQuery, MeR
             ))
             .OrderByDescending(s => s.CreatedAt)
             .ToList();
+        
+        var store = await sender.Send(new GetStoreByOwnerIdQuery(user.Id) , cancellationToken);
 
         var dto = new UserMeDto(
             user.Id,
@@ -37,6 +41,7 @@ public class MeHandler(IdentityDbContext dbContext) : IQueryHandler<MeQuery, MeR
             user.IsActive,
             user.EmailConfirmed,
             user.Role.ToString(),
+            store.Store?.StoreId,
             sessions
         );
 
