@@ -1,5 +1,7 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using NSubstitute;
+using Shared.Contracts.FileStorage;
 using Stores.Data;
 using Stores.Stores.Dtos;
 using Stores.Stores.Exceptions;
@@ -13,13 +15,18 @@ namespace Stores.Tests.Features.UpdateStore;
 public class UpdateStoreHandlerTests : IDisposable
 {
     private readonly StoresDbContext _dbContext;
+    private readonly IFileStorageService _fileStorage;
     private readonly UpdateStoreHandler _handler;
     private readonly Guid _ownerId = Guid.NewGuid();
 
     public UpdateStoreHandlerTests()
     {
         _dbContext = DbContextFactory.Create();
-        _handler = new UpdateStoreHandler(_dbContext);
+        _fileStorage = Substitute.For<IFileStorageService>();
+        _fileStorage.UploadAsync(Arg.Any<Stream>(), Arg.Any<string>(), Arg.Any<string>(),
+                Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns(new FileUploadResult("https://blob.test/new-image.png", "new-image.png"));
+        _handler = new UpdateStoreHandler(_dbContext, _fileStorage);
     }
 
     private Store SeedStore(string name = "Original", string slug = "original", Guid? ownerId = null)
@@ -33,10 +40,16 @@ public class UpdateStoreHandlerTests : IDisposable
     private static UpdateStoreDto ValidUpdateDto(
         string name = "Updated Store",
         string slug = "updated-store",
-        string description = "Updated description",
-        string logoUrl = "https://example.com/new-logo.png",
-        string? coverUrl = "https://example.com/new-cover.png") =>
-        new(name, slug, description, logoUrl, coverUrl);
+        string description = "Updated description") =>
+        new(name, slug, description, null, null, null, null, null, null);
+
+    private static UpdateStoreDto ValidUpdateDtoWithImages(
+        string name = "Updated Store",
+        string slug = "updated-store",
+        string description = "Updated description") =>
+        new(name, slug, description,
+            new MemoryStream([1, 2, 3]), "new-logo.png", "image/png",
+            new MemoryStream([4, 5, 6]), "new-cover.png", "image/png");
 
     [Fact]
     public async Task Handle_ValidCommand_UpdatesStoreAndReturnsDto()
@@ -52,8 +65,6 @@ public class UpdateStoreHandlerTests : IDisposable
         result.Store.Name.Should().Be("Updated Store");
         result.Store.Slug.Should().Be("updated-store");
         result.Store.Description.Should().Be("Updated description");
-        result.Store.LogoUrl.Should().Be("https://example.com/new-logo.png");
-        result.Store.CoverUrl.Should().Be("https://example.com/new-cover.png");
         result.Store.OwnerId.Should().Be(_ownerId);
     }
 
@@ -70,8 +81,6 @@ public class UpdateStoreHandlerTests : IDisposable
         updated.Name.Should().Be("Updated Store");
         updated.Slug.Should().Be("updated-store");
         updated.Description.Should().Be("Updated description");
-        updated.LogoUrl.Should().Be("https://example.com/new-logo.png");
-        updated.CoverUrl.Should().Be("https://example.com/new-cover.png");
     }
 
     [Fact]
@@ -87,15 +96,29 @@ public class UpdateStoreHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task Handle_NullCoverUrl_UpdatesSuccessfully()
+    public async Task Handle_NoImages_KeepsExistingUrls()
     {
         var store = SeedStore();
-        var dto = ValidUpdateDto(coverUrl: null);
+        var dto = ValidUpdateDto();
         var command = new UpdateStoreRequest(dto, store.Id);
 
         var result = await _handler.Handle(command, CancellationToken.None);
 
-        result.Store.CoverUrl.Should().BeNull();
+        result.Store.LogoUrl.Should().Be("https://example.com/logo.png");
+        result.Store.CoverUrl.Should().Be("https://example.com/cover.png");
+    }
+
+    [Fact]
+    public async Task Handle_WithImages_UploadsNewImages()
+    {
+        var store = SeedStore();
+        var dto = ValidUpdateDtoWithImages();
+        var command = new UpdateStoreRequest(dto, store.Id);
+
+        var result = await _handler.Handle(command, CancellationToken.None);
+
+        result.Store.LogoUrl.Should().Be("https://blob.test/new-image.png");
+        result.Store.CoverUrl.Should().Be("https://blob.test/new-image.png");
     }
 
     [Fact]
