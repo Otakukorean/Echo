@@ -1,6 +1,8 @@
+using Shared.Contracts.StoreScoping;
+
 namespace Catalog.Catalog.Models;
 
-public class Products : Aggregate<Guid>
+public class Products : Aggregate<Guid>, IStoreScoped
 {
     public Guid StoreId { get; private set; }
     public string Name { get; private set; } = null!;
@@ -16,6 +18,9 @@ public class Products : Aggregate<Guid>
 
     private readonly List<ProductImage> _images = new();
     public IReadOnlyCollection<ProductImage> Images => _images.AsReadOnly();
+    
+    private readonly List<Variation> _variations = new();
+    public IReadOnlyCollection<Variation> Variations => _variations.AsReadOnly();
 
     private Products() { }
 
@@ -39,6 +44,30 @@ public class Products : Aggregate<Guid>
             product._categories.Add(category);
 
         return product;
+    }
+
+    public void Update(string name, string slug, string? description, decimal price,
+        string currency, bool isActive, string? sku)
+    {
+        Name = name;
+        Slug = slug;
+        Description = description;
+        Price = price;
+        Currency = currency;
+        IsActive = isActive;
+        Sku = sku;
+    }
+
+    public void ClearCategories()
+    {
+        _categories.Clear();
+    }
+
+    public void ReplaceCategories(IEnumerable<Category> categories)
+    {
+        _categories.Clear();
+        foreach (var category in categories)
+            _categories.Add(category);
     }
 
     public void AddCategory(Category category)

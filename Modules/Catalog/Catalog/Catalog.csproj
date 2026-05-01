@@ -6,12 +6,14 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+
     <ItemGroup>
+      <ProjectReference Include="..\..\..\Shared.Contracts\Shared.Contracts.csproj" />
       <ProjectReference Include="..\..\..\Shared\Shared.csproj" />
+      <ProjectReference Include="..\..\Stores\Stores.Contracts\Stores.Contracts.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Catalog\Dtos\" />
       <Folder Include="Catalog\EventHandlers\" />
       <Folder Include="Catalog\Event\" />
       <Folder Include="Catalog\Exceptions\" />

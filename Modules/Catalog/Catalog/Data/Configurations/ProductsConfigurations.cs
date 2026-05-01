@@ -14,7 +14,7 @@ public class ProductsConfigurations : IEntityTypeConfiguration<Products>
         builder.Property(x => x.Description).HasMaxLength(255);
         builder.Property(x => x.Price).IsRequired();
         builder.Property(x => x.Sku).HasMaxLength(255);
-
+        builder.Property(x => x.Currency).HasMaxLength(255);
         builder.HasIndex(x => x.Slug).IsUnique();
         
         builder.HasMany(x => x.Categories)
@@ -25,8 +25,14 @@ public class ProductsConfigurations : IEntityTypeConfiguration<Products>
             .WithOne()
             .HasForeignKey(x => x.ProductId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(x => x.Variations)
+            .WithOne()
+            .HasForeignKey(x => x.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
         
         builder.Navigation(x => x.Categories).UsePropertyAccessMode(PropertyAccessMode.Field);
         builder.Navigation(x => x.Images).UsePropertyAccessMode(PropertyAccessMode.Field);
+        builder.Navigation(x => x.Variations).UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

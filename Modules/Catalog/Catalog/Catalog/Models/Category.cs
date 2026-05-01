@@ -1,7 +1,8 @@
+using Shared.Contracts.StoreScoping;
 
 namespace Catalog.Catalog.Models;
 
-public class Category : Entity<Guid>
+public class Category : Entity<Guid>, IStoreScoped
 {
     public Guid StoreId { get; private set; }
     public string Name { get; private set; }
@@ -21,5 +22,12 @@ public class Category : Entity<Guid>
             Slug = slug,
             Description = description
         };
+    }
+
+    public void Update(string name, string slug, string? description)
+    {
+        Name = name;
+        Slug = slug;
+        Description = description;
     }
 }
