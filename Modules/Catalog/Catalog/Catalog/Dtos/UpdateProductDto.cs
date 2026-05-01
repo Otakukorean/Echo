@@ -1,6 +1,6 @@
 namespace Catalog.Catalog.Dtos;
 
-public record CreateProductDto(
+public record UpdateProductDto(
     string Name,
     string Slug,
     string? Description,
@@ -8,5 +8,4 @@ public record CreateProductDto(
     string Currency,
     bool IsActive,
     string? Sku,
-    List<Guid> CategoryIds
-    );
+    List<Guid> CategoryIds);
