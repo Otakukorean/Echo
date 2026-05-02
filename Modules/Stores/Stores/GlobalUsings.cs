@@ -13,3 +13,4 @@ global using Stores.Stores.Dtos;
 global using Shared.Contracts.StoreContext;
 global using Stores.Stores.Services;
 global using Shared.Authorization;
+global using MediatR;
